@@ -19,7 +19,7 @@ public unsafe struct ComponentHooks
     public CallbackIterator? OnSet;
     public CallbackIterator? OnRemove;
 
-    
+    [MonoPInvokeCallback(typeof(FnPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate))]
     private static void CallbackConstructor(void* pointer, int count, ecs_type_info_t* typeInfo)
     {
         ref var data = ref CallbacksHelper.GetComponentHooksCallbackContext(typeInfo->hooks.binding_ctx);
@@ -27,7 +27,7 @@ public unsafe struct ComponentHooks
         data.Hooks.Constructor?.Invoke(ref context);
     }
 
-    
+    [MonoPInvokeCallback(typeof(FnPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate))]
     private static void CallbackDeconstructor(void* pointer, int count, ecs_type_info_t* typeInfo)
     {
         ref var data = ref CallbacksHelper.GetComponentHooksCallbackContext(typeInfo->hooks.binding_ctx);
@@ -35,7 +35,7 @@ public unsafe struct ComponentHooks
         data.Hooks.Deconstructor?.Invoke(ref context);
     }
 
-    
+    [MonoPInvokeCallback(typeof(FnPtr_VoidPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate))]
     private static void CallbackCopy(void* destinationPointer, void* sourcePointer, int count, ecs_type_info_t* typeInfo)
     {
         ref var data = ref CallbacksHelper.GetComponentHooksCallbackContext(typeInfo->hooks.binding_ctx);
@@ -43,7 +43,7 @@ public unsafe struct ComponentHooks
         data.Hooks.Copy?.Invoke(ref context);
     }
 
-    
+    [MonoPInvokeCallback(typeof(FnPtr_VoidPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate))]
     private static void CallbackMove(void* destinationPointer, void* sourcePointer, int count, ecs_type_info_t* typeInfo)
     {
         ref var data = ref CallbacksHelper.GetComponentHooksCallbackContext(typeInfo->hooks.binding_ctx);
@@ -77,22 +77,24 @@ public unsafe struct ComponentHooks
 
     internal static void Fill(World world, ref ComponentHooks hooks, ecs_type_hooks_t* desc)
     {
-        // FnPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate PointerCallbackConstructor  =  CallbackConstructor;
-        // desc->ctor.Data.Pointer =Marshal.GetFunctionPointerForDelegate(PointerCallbackConstructor) ;//(delegate* unmanaged[Cdecl]<void*, int, ecs_type_info_t*, void>)PointerCallbackConstructor;//Marshal.GetFunctionPointerForDelegate(new CallbackConstructorDelegate(CallbackConstructor));//&CallbackConstructor;
-        //
-        // delegate* <void*, int, ecs_type_info_t*, void> PointerCallbackDeconstructor  = & CallbackDeconstructor;
-        // desc->dtor.Data.Pointer = (delegate* unmanaged[Cdecl]<void*, int, ecs_type_info_t*, void>)PointerCallbackDeconstructor;
-        //
-        // delegate* <void*, void*, int, ecs_type_info_t*, void> PointerCallbackCopy = &CallbackCopy;
-        // desc->copy.Data.Pointer = (delegate* unmanaged[Cdecl]<void*, void*, int, ecs_type_info_t*, void>)PointerCallbackCopy;
-        //
-        // delegate* <void*, void*, int, ecs_type_info_t*, void> PointerCallbackMove = &CallbackMove;
-        // desc->move.Data.Pointer = (delegate* unmanaged[Cdecl]<void*, void*, int, ecs_type_info_t*, void>)PointerCallbackMove;
+        FnPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate PointerCallbackConstructor  =  CallbackConstructor;
+        desc->ctor.Data.Pointer =Marshal.GetFunctionPointerForDelegate(PointerCallbackConstructor) ;//(delegate* unmanaged[Cdecl]<void*, int, ecs_type_info_t*, void>)PointerCallbackConstructor;//Marshal.GetFunctionPointerForDelegate(new CallbackConstructorDelegate(CallbackConstructor));//&CallbackConstructor;
         
-        FnPtr_Ecs_iter_tPtr_Void.@delegate t = CallbackOnAdd;
-        desc->on_add.Data.Pointer = Marshal.GetFunctionPointerForDelegate(t) ;
+        FnPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate PointerCallbackDeconstructor  =  CallbackDeconstructor;
+        desc->dtor.Data.Pointer = Marshal.GetFunctionPointerForDelegate(PointerCallbackDeconstructor);
         
-        delegate* <ecs_iter_t*, void> p7 = &CallbackOnSet;
+        FnPtr_VoidPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate PointerCallbackCopy = CallbackCopy;
+        desc->copy.Data.Pointer = Marshal.GetFunctionPointerForDelegate(PointerCallbackCopy);
+        
+        FnPtr_VoidPtr_VoidPtr_Int_Ecs_type_info_tPtr_Void.@delegate PointerCallbackMove = CallbackMove;
+        desc->move.Data.Pointer = Marshal.GetFunctionPointerForDelegate(PointerCallbackMove);
+        
+        FnPtr_Ecs_iter_tPtr_Void.@delegate PointerCallbackOnAdd = CallbackOnAdd;
+        desc->on_add.Data.Pointer = Marshal.GetFunctionPointerForDelegate(PointerCallbackOnAdd) ;
+        
+        FnPtr_Ecs_iter_tPtr_Void.@delegate PointerCallbackOnSet = CallbackOnSet;
+        desc->on_set.Data.Pointer=Marshal.GetFunctionPointerForDelegate(PointerCallbackOnSet) ;
+        
         desc->binding_ctx = (void*)CallbacksHelper.CreateComponentHooksCallbackContext(world, hooks);
     }
 }
