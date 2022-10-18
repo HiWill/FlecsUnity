@@ -5,3 +5,7 @@
 /Temp/
 /UserSettings/
 /.idea/
+/Assets/StreamingAssets/
+/build/
+/Assets/StreamingAssets.meta
+*.csproj
