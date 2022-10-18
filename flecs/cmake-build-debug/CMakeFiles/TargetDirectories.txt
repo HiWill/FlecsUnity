@@ -1,0 +1,3 @@
+D:/test/TestNative/flecs/cmake-build-debug/CMakeFiles/flecs.dir
+D:/test/TestNative/flecs/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/test/TestNative/flecs/cmake-build-debug/CMakeFiles/rebuild_cache.dir
