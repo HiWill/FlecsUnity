@@ -20,39 +20,10 @@ public struct Velocity : IComponent
     public double X;
     public double Y;
 }
-public unsafe class NewBehaviourScript : MonoBehaviour
+public unsafe class TestFlecs : MonoBehaviour
 {
-    public TextMeshProUGUI te;
-    // [DllImport("flecs")]
-    // public static extern int add(int a, int b);
-    public static TextMeshProUGUI teInfo;
- 
-    public struct callback_ecs_type_hooks_t
-    { 
-        public callback_ecs_iter_action_t on_add; 
-        public callback_ecs_iter_action_t on_Remove;
-    }
-    public struct callback_ecs_iter_t
-    {
-        public int a;
-    }
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void callback_ecs_iter_action_t(ref callback_ecs_iter_t t);
-    
-    [MonoPInvokeCallback(typeof(callback_ecs_iter_action_t))] 
-    public static void TestCallback(ref callback_ecs_iter_t t)
-    {
-        teInfo.text=(t.a).ToString();
-    }
-    [MonoPInvokeCallback(typeof(callback_ecs_iter_action_t))] 
-    public static void TestCallbackRemove(ref callback_ecs_iter_t t)
-    {
-        teInfo.text+=" "+(t.a).ToString();
-    }
-    
-    [DllImport("flecs", CallingConvention = CallingConvention.Cdecl)]
-    public static extern void callback_ecs_set_hooks_id(ref callback_ecs_type_hooks_t hooks);
+    public TextMeshProUGUI textInfo; 
+    public static TextMeshProUGUI textInfoStatic; 
     
     private static void Move(Iterator iterator)
     {
@@ -74,18 +45,10 @@ public unsafe class NewBehaviourScript : MonoBehaviour
     private World world;
     void Start()
     {
-        teInfo = te;
-        // var hooks = new callback_ecs_type_hooks_t
-        // {
-        //     on_add = TestCallback,
-        //     on_Remove = TestCallbackRemove
-        // };
-        // callback_ecs_set_hooks_id(ref hooks);
+        textInfoStatic = textInfo; 
         try
-        {
-            //te.text = (add(1,2)).ToString();
-            //flecs.ecs_world_t* Handle=flecs.ecs_init_w_args(0,flecs.Runtime.CStrings.CStringArray(ReadOnlySpan<string>.Empty));
-             world = new World(new String []{}); 
+        { 
+            world = new World(new String []{}); 
             var componentHooks = new ComponentHooks
             { 
                 OnAdd = HookCallback,
@@ -105,7 +68,7 @@ public unsafe class NewBehaviourScript : MonoBehaviour
         }
         catch (Exception e)
         {
-            te.text = e.ToString();
+            textInfo.text = e.ToString();
             print(e.ToString());
         } 
     }
@@ -114,7 +77,7 @@ public unsafe class NewBehaviourScript : MonoBehaviour
     {
         var t = Time.realtimeSinceStartup;
         world.Progress(0);
-        te.text = (Time.realtimeSinceStartup - t).ToString();
+        textInfo.text = (Time.realtimeSinceStartup - t).ToString();
     }
 
     private static void HookCallback(Iterator iterator)
@@ -123,7 +86,7 @@ public unsafe class NewBehaviourScript : MonoBehaviour
         {
             var eventName = iterator.Event().Name();
             var entityName = iterator.Entity(i).Name(); 
-            teInfo.text=("\t" + eventName + ": " + entityName);
+            textInfoStatic.text=("\t" + eventName + ": " + entityName);
         }
     }
     
